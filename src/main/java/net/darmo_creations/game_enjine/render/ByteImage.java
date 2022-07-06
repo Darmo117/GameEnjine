@@ -1,4 +1,4 @@
-package net.darmo_creations.game_engine.render;
+package net.darmo_creations.game_enjine.render;
 
 import org.lwjgl.system.MemoryStack;
 

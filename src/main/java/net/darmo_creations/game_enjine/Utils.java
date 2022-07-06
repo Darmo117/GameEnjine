@@ -1,4 +1,4 @@
-package net.darmo_creations.game_engine;
+package net.darmo_creations.game_enjine;
 
 public class Utils {
   public static double getTime() {

@@ -1,7 +1,7 @@
-package net.darmo_creations.game_engine.render;
+package net.darmo_creations.game_enjine.render;
 
-import net.darmo_creations.game_engine.GameEnjine;
-import net.darmo_creations.game_engine.input.InputHandler;
+import net.darmo_creations.game_enjine.GameEnjine;
+import net.darmo_creations.game_enjine.input.InputHandler;
 import org.lwjgl.glfw.GLFWImage;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.glfw.GLFWWindowSizeCallback;

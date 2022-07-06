@@ -1,10 +1,10 @@
-package net.darmo_creations.game_engine;
+package net.darmo_creations.game_enjine;
 
-import net.darmo_creations.game_engine.render.Camera;
-import net.darmo_creations.game_engine.render.Shader;
-import net.darmo_creations.game_engine.render.Window;
-import net.darmo_creations.game_engine.world.TileRenderer;
-import net.darmo_creations.game_engine.world.World;
+import net.darmo_creations.game_enjine.render.Camera;
+import net.darmo_creations.game_enjine.render.Shader;
+import net.darmo_creations.game_enjine.render.Window;
+import net.darmo_creations.game_enjine.world.TileRenderer;
+import net.darmo_creations.game_enjine.world.World;
 import org.joml.Vector3f;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWErrorCallback;

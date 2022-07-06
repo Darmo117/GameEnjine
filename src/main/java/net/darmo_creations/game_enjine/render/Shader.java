@@ -1,4 +1,4 @@
-package net.darmo_creations.game_engine.render;
+package net.darmo_creations.game_enjine.render;
 
 import org.joml.Matrix4f;
 import org.joml.Vector4f;

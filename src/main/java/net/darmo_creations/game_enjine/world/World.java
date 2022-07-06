@@ -1,8 +1,8 @@
-package net.darmo_creations.game_engine.world;
+package net.darmo_creations.game_enjine.world;
 
-import net.darmo_creations.game_engine.render.Camera;
-import net.darmo_creations.game_engine.render.Shader;
-import net.darmo_creations.game_engine.render.Window;
+import net.darmo_creations.game_enjine.render.Camera;
+import net.darmo_creations.game_enjine.render.Shader;
+import net.darmo_creations.game_enjine.render.Window;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 

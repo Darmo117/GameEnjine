@@ -1,4 +1,4 @@
-package net.darmo_creations.game_engine.input;
+package net.darmo_creations.game_enjine.input;
 
 import static org.lwjgl.glfw.GLFW.*;
 

@@ -1,4 +1,4 @@
-package net.darmo_creations.game_engine.world;
+package net.darmo_creations.game_enjine.world;
 
 import java.io.File;
 

@@ -1,4 +1,4 @@
-package net.darmo_creations.game_engine;
+package net.darmo_creations.game_enjine;
 
 import java.io.IOException;
 
