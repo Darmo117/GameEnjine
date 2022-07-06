@@ -36,15 +36,13 @@ public class TileRenderer {
 
     this.tileModel = new Model(vertices, texture, indices);
 
-    for (int i = 0; i < Tile.TILES.length; i++) {
-      if (Tile.TILES[i] != null) {
-        if (!this.tileTextures.containsKey(Tile.TILES[i].getTexture())) {
-          String tex = Tile.TILES[i].getTexture();
-          try {
-            this.tileTextures.put(tex, new Texture(tex + ".png"));
-          } catch (IOException e) {
-            throw new RuntimeException(e);
-          }
+    for (Tile tile : Tile.TILES.values()) {
+      String tex = tile.getTexture();
+      if (!this.tileTextures.containsKey(tex)) {
+        try {
+          this.tileTextures.put(tex, new Texture(tex + ".png"));
+        } catch (IOException e) {
+          throw new RuntimeException(e);
         }
       }
     }

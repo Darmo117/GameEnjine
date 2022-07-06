@@ -1,18 +1,21 @@
 package net.darmo_creations.game_enjine.world;
 
+import net.darmo_creations.game_enjine.config.GameState;
 import net.darmo_creations.game_enjine.render.Camera;
 import net.darmo_creations.game_enjine.render.Shader;
 import net.darmo_creations.game_enjine.render.Window;
+import net.darmo_creations.game_enjine.world.interactions.TileInteraction;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-
-import java.util.Arrays;
 
 public class World {
   private static final int TILE_SCALE = 8;
 
+  private final String name;
+  private final int width;
+  private final int height;
   private final int[] tiles;
-  private final int width, height;
+  private final TileInteraction[] tileInteractions;
   private int scale;
   private int viewX, viewY;
 
@@ -21,18 +24,20 @@ public class World {
   private final TileRenderer tileRenderer;
   private final Camera camera;
 
-  public World(final int width, final int height) {
+  public World(final String name, final int width, final int height, int[] tiles, TileInteraction[] tileInteractions, GameState gameState) {
+    this.name = name;
     this.width = width;
     this.height = height;
+    this.tiles = tiles;
+    this.tileInteractions = tileInteractions;
     this.setScale(3);
     this.matrix = new Matrix4f().scale(this.scale);
     this.tileRenderer = new TileRenderer();
     this.camera = new Camera();
-    this.tiles = new int[width * height];
-    // TEMP
-    Arrays.fill(this.tiles, Tile.TEST_TILE.getID());
-    this.setTile(Tile.TEST_TILE_2, 0, 0);
-    this.setTile(Tile.TEST_TILE_2, width - 1, height - 1);
+  }
+
+  public String getName() {
+    return this.name;
   }
 
   public int getScale() {
@@ -50,11 +55,18 @@ public class World {
     return this.camera;
   }
 
+  public TileInteraction getTileInteraction(final int x, final int y) {
+    if (x < 0 || y < 0 || x >= this.width || y >= this.height) {
+      return null;
+    }
+    return this.tileInteractions[x + y * this.width];
+  }
+
   public Tile getTile(final int x, final int y) {
     if (x < 0 || y < 0 || x >= this.width || y >= this.height) {
       return null;
     }
-    return Tile.TILES[this.tiles[x + y * this.width]];
+    return Tile.TILES.get(this.tiles[x + y * this.width]);
   }
 
   public void setTile(Tile tile, final int x, final int y) {

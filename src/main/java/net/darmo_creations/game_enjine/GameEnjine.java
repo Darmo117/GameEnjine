@@ -1,10 +1,14 @@
 package net.darmo_creations.game_enjine;
 
 import net.darmo_creations.game_enjine.config.EngineConfig;
+import net.darmo_creations.game_enjine.config.GameState;
 import net.darmo_creations.game_enjine.config.UserConfig;
 import net.darmo_creations.game_enjine.render.Shader;
 import net.darmo_creations.game_enjine.render.Window;
+import net.darmo_creations.game_enjine.utils.TimeUtils;
+import net.darmo_creations.game_enjine.world.Tile;
 import net.darmo_creations.game_enjine.world.World;
+import net.darmo_creations.game_enjine.world.WorldLoader;
 import org.joml.Vector3f;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWErrorCallback;
@@ -30,7 +34,9 @@ public class GameEnjine {
   private final Window window;
   private final Shader globalShader;
 
-  private GameState state;
+  private EngineState state;
+  private GameState gameState;
+  private final WorldLoader worldLoader;
   @Nullable
   private World world;
 
@@ -50,7 +56,9 @@ public class GameEnjine {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-    this.setState(GameState.INGAME);
+    Tile.loadTiles();
+    this.worldLoader = new WorldLoader();
+    this.setState(EngineState.MENU);
   }
 
   private void initWindow() {
@@ -78,12 +86,22 @@ public class GameEnjine {
     return this.userConfig;
   }
 
-  public GameState getState() {
+  public EngineState getState() {
     return this.state;
   }
 
-  public void setState(GameState state) {
+  public void setState(EngineState state) {
     this.state = state;
+  }
+
+  public void loadWorld(final String name) {
+    try {
+      this.world = this.worldLoader.loadWorld(name, this.gameState);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+    this.world.calculateView(this.window);
+    this.setState(EngineState.INGAME);
   }
 
   public void run() {
@@ -93,19 +111,18 @@ public class GameEnjine {
   }
 
   private void loop() {
-    this.world = new World(20, 20);
-    this.world.calculateView(this.window);
+    this.loadWorld("map1");
 
     // Cap FPS
     final double FRAME_CAP = 1 / 60.0; // 60 FPS
-    double prevTime = Utils.getTime();
+    double prevTime = TimeUtils.getTime();
     double unprocessed = 0;
     double frameTime = 0;
     int fps = 0;
     boolean canRender = false;
 
     while (!this.window.shouldClose()) {
-      double now = Utils.getTime();
+      double now = TimeUtils.getTime();
       double elapsed = now - prevTime;
       unprocessed += elapsed;
       frameTime += elapsed;
@@ -115,11 +132,15 @@ public class GameEnjine {
         unprocessed -= FRAME_CAP;
         canRender = true;
         if (this.window.hasResized()) {
-          this.world.calculateView(this.window);
+          if (this.world != null) {
+            this.world.calculateView(this.window);
+          }
           glViewport(0, 0, this.window.getWidth(), this.window.getHeight());
         }
         this.pollEvents();
-        this.world.update(this.window);
+        if (this.world != null) {
+          this.world.update(this.window);
+        }
         this.window.update();
         if (frameTime >= 1) {
           System.out.println("FPS: " + fps);

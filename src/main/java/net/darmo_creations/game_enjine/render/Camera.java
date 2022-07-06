@@ -4,6 +4,7 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 public class Camera {
+  @SuppressWarnings("FieldMayBeFinal")
   private Vector3f position;
   private Matrix4f projection;
 

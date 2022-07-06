@@ -1,6 +1,6 @@
 package net.darmo_creations.game_enjine;
 
-public enum GameState {
+public enum EngineState {
   INGAME,
   MENU,
   INGAME_MENU,
