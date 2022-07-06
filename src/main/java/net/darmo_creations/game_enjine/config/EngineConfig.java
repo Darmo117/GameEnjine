@@ -1,4 +1,4 @@
-package net.darmo_creations.game_enjine;
+package net.darmo_creations.game_enjine.config;
 
 import org.ini4j.Wini;
 

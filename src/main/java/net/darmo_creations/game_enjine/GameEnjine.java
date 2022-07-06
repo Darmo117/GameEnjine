@@ -1,15 +1,16 @@
 package net.darmo_creations.game_enjine;
 
-import net.darmo_creations.game_enjine.render.Camera;
+import net.darmo_creations.game_enjine.config.EngineConfig;
+import net.darmo_creations.game_enjine.config.UserConfig;
 import net.darmo_creations.game_enjine.render.Shader;
 import net.darmo_creations.game_enjine.render.Window;
-import net.darmo_creations.game_enjine.world.TileRenderer;
 import net.darmo_creations.game_enjine.world.World;
 import org.joml.Vector3f;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -27,11 +28,11 @@ public class GameEnjine {
   private final UserConfig userConfig;
 
   private final Window window;
-  private final Camera camera;
-  private final TileRenderer tileRenderer;
   private final Shader globalShader;
 
   private GameState state;
+  @Nullable
+  private World world;
 
   public GameEnjine() throws IOException {
     glfwSetErrorCallback((error, description) -> {
@@ -44,19 +45,12 @@ public class GameEnjine {
     }
     this.window = new Window(this.userConfig.windowWidth(), this.userConfig.windowHeight(), this.userConfig.fullScreen(), this.config.resizable());
     this.initWindow();
-    GL.createCapabilities(); // Needed to make LWJGL and GLFW interoperable
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glClearColor(0, 0, 0, 0);
-    glEnable(GL_TEXTURE_2D);
-    this.camera = new Camera(this.userConfig.windowWidth(), this.userConfig.windowHeight());
-    this.tileRenderer = new TileRenderer();
     try {
       this.globalShader = new Shader("shader");
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-    this.setState(GameState.MENU);
+    this.setState(GameState.INGAME);
   }
 
   private void initWindow() {
@@ -69,6 +63,11 @@ public class GameEnjine {
     if (this.config.grabCursor()) {
       this.window.grabCursor();
     }
+    GL.createCapabilities(); // Needed to make LWJGL and GLFW interoperable
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glClearColor(0, 0, 0, 0);
+    glEnable(GL_TEXTURE_2D);
   }
 
   public EngineConfig getConfig() {
@@ -94,8 +93,8 @@ public class GameEnjine {
   }
 
   private void loop() {
-    World world = new World(20, 20);
-    world.calculateView(this.window);
+    this.world = new World(20, 20);
+    this.world.calculateView(this.window);
 
     // Cap FPS
     final double FRAME_CAP = 1 / 60.0; // 60 FPS
@@ -116,15 +115,11 @@ public class GameEnjine {
         unprocessed -= FRAME_CAP;
         canRender = true;
         if (this.window.hasResized()) {
-          this.camera.setProjection(this.window.getWidth(), this.window.getHeight());
-          world.calculateView(this.window);
+          this.world.calculateView(this.window);
           glViewport(0, 0, this.window.getWidth(), this.window.getHeight());
         }
-        if (this.window.getInputHandler().isKeyDown(GLFW_KEY_ESCAPE)) {
-          glfwSetWindowShouldClose(this.window.getWindowPointer(), true);
-        }
         this.pollEvents();
-        world.update(this.window, this.camera);
+        this.world.update(this.window);
         this.window.update();
         if (frameTime >= 1) {
           System.out.println("FPS: " + fps);
@@ -135,7 +130,7 @@ public class GameEnjine {
 
       if (canRender) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        world.render(this.tileRenderer, this.globalShader, this.camera, this.window);
+        this.world.render(this.globalShader, this.window);
         this.window.swapBuffers();
         fps++;
       }
@@ -143,18 +138,24 @@ public class GameEnjine {
   }
 
   private void pollEvents() {
+    if (this.window.getInputHandler().isKeyDown(GLFW_KEY_ESCAPE)) {
+      glfwSetWindowShouldClose(this.window.getWindowPointer(), true);
+    }
+    if (this.world == null) {
+      return;
+    }
     float speed = 10;
     if (this.window.getInputHandler().isKeyDown(GLFW_KEY_A)) {
-      this.camera.getPosition().sub(new Vector3f(-speed, 0, 0));
+      this.world.getCamera().getPosition().sub(new Vector3f(-speed, 0, 0));
     }
     if (this.window.getInputHandler().isKeyDown(GLFW_KEY_D)) {
-      this.camera.getPosition().sub(new Vector3f(speed, 0, 0));
+      this.world.getCamera().getPosition().sub(new Vector3f(speed, 0, 0));
     }
     if (this.window.getInputHandler().isKeyDown(GLFW_KEY_W)) {
-      this.camera.getPosition().sub(new Vector3f(0, speed, 0));
+      this.world.getCamera().getPosition().sub(new Vector3f(0, speed, 0));
     }
     if (this.window.getInputHandler().isKeyDown(GLFW_KEY_S)) {
-      this.camera.getPosition().sub(new Vector3f(0, -speed, 0));
+      this.world.getCamera().getPosition().sub(new Vector3f(0, -speed, 0));
     }
   }
 

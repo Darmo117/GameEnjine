@@ -4,4 +4,5 @@ public enum GameState {
   INGAME,
   MENU,
   INGAME_MENU,
+  DIALOG,
 }

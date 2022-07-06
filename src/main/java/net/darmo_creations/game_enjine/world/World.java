@@ -9,7 +9,7 @@ import org.joml.Vector3f;
 import java.util.Arrays;
 
 public class World {
-  private static final int SCALE = 8;
+  private static final int TILE_SCALE = 8;
 
   private final int[] tiles;
   private final int width, height;
@@ -18,12 +18,18 @@ public class World {
 
   private final Matrix4f matrix;
 
+  private final TileRenderer tileRenderer;
+  private final Camera camera;
+
   public World(final int width, final int height) {
     this.width = width;
     this.height = height;
-    this.setScale(1);
+    this.setScale(3);
     this.matrix = new Matrix4f().scale(this.scale);
+    this.tileRenderer = new TileRenderer();
+    this.camera = new Camera();
     this.tiles = new int[width * height];
+    // TEMP
     Arrays.fill(this.tiles, Tile.TEST_TILE.getID());
     this.setTile(Tile.TEST_TILE_2, 0, 0);
     this.setTile(Tile.TEST_TILE_2, width - 1, height - 1);
@@ -37,7 +43,11 @@ public class World {
     if (scale <= 0) {
       throw new IllegalArgumentException("scale must be > 0");
     }
-    this.scale = scale * SCALE;
+    this.scale = scale * TILE_SCALE;
+  }
+
+  public Camera getCamera() {
+    return this.camera;
   }
 
   public Tile getTile(final int x, final int y) {
@@ -57,27 +67,28 @@ public class World {
   public void calculateView(final Window window) {
     this.viewX = (window.getWidth() / (this.scale * 2)) + 4;
     this.viewY = (window.getHeight() / (this.scale * 2)) + 4;
+    this.camera.setProjection(window.getWidth(), window.getHeight());
   }
 
-  public void render(final TileRenderer tileRenderer, final Shader shader, final Camera camera, final Window window) {
-    int posX = ((int) camera.getPosition().x + window.getWidth() / 2) / (this.scale * 2);
-    int posY = ((int) camera.getPosition().y - window.getHeight() / 2) / (this.scale * 2);
+  public void render(final Shader shader, final Window window) {
+    int posX = ((int) this.camera.getPosition().x + window.getWidth() / 2) / (this.scale * 2);
+    int posY = ((int) this.camera.getPosition().y - window.getHeight() / 2) / (this.scale * 2);
     for (int x = 0; x < this.viewX; x++) {
       for (int y = 0; y < this.viewY; y++) {
         Tile t = this.getTile(x - posX, y + posY);
         if (t != null) {
-          tileRenderer.renderTile(t, x - posX, -y - posY, shader, this.matrix, camera);
+          this.tileRenderer.renderTile(t, x - posX, -y - posY, shader, this.matrix, this.camera);
         }
       }
     }
   }
 
-  public void update(final Window window, Camera camera) {
-    this.capCameraPosition(window, camera);
+  public void update(final Window window) {
+    this.capCameraPosition(window);
   }
 
-  private void capCameraPosition(final Window window, Camera camera) {
-    Vector3f pos = camera.getPosition();
+  private void capCameraPosition(final Window window) {
+    Vector3f pos = this.camera.getPosition();
     int w = this.width * this.scale * 2;
     int h = this.height * this.scale * 2;
 
