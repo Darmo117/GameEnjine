@@ -1,0 +1,57 @@
+plugins {
+    id 'java'
+}
+
+group 'net.darmo-creations'
+version '1.0'
+
+var lwjglVersion = '3.3.0'
+var lwjglNatives = 'natives-linux'
+
+repositories {
+    mavenCentral()
+    maven {
+        url 'https://oss.sonatype.org/content/repositories/snapshots/'
+    }
+}
+
+dependencies {
+    // JUnit
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+
+    implementation 'com.google.code.findbugs:jsr305:3.0.2'
+    implementation 'org.joml:joml:1.10.4'
+
+//    implementation 'de.gurkenlabs:litiengine:0.5.2'
+    // INI4J
+    implementation 'org.ini4j:ini4j:0.5.4'
+
+    // LWJGL
+    implementation(platform("org.lwjgl:lwjgl-bom:$lwjglVersion"))
+    implementation('org.lwjgl:lwjgl')
+    implementation('org.lwjgl:lwjgl-assimp')
+    implementation('org.lwjgl:lwjgl-bgfx')
+    implementation('org.lwjgl:lwjgl-glfw')
+    implementation('org.lwjgl:lwjgl-nanovg')
+    implementation('org.lwjgl:lwjgl-nuklear')
+    implementation('org.lwjgl:lwjgl-openal')
+    implementation('org.lwjgl:lwjgl-opengl')
+    implementation('org.lwjgl:lwjgl-par')
+    implementation('org.lwjgl:lwjgl-stb')
+    implementation('org.lwjgl:lwjgl-vulkan')
+    runtimeOnly(group: 'org.lwjgl', name: 'lwjgl', classifier: lwjglNatives)
+    runtimeOnly(group: 'org.lwjgl', name: 'lwjgl-assimp', classifier: lwjglNatives)
+    runtimeOnly(group: 'org.lwjgl', name: 'lwjgl-bgfx', classifier: lwjglNatives)
+    runtimeOnly(group: 'org.lwjgl', name: 'lwjgl-glfw', classifier: lwjglNatives)
+    runtimeOnly(group: 'org.lwjgl', name: 'lwjgl-nanovg', classifier: lwjglNatives)
+    runtimeOnly(group: 'org.lwjgl', name: 'lwjgl-nuklear', classifier: lwjglNatives)
+    runtimeOnly(group: 'org.lwjgl', name: 'lwjgl-openal', classifier: lwjglNatives)
+    runtimeOnly(group: 'org.lwjgl', name: 'lwjgl-opengl', classifier: lwjglNatives)
+    runtimeOnly(group: 'org.lwjgl', name: 'lwjgl-par', classifier: lwjglNatives)
+    runtimeOnly(group: 'org.lwjgl', name: 'lwjgl-stb', classifier: lwjglNatives)
+}
+
+test {
+    useJUnitPlatform()
+}
