@@ -94,7 +94,7 @@ public class WorldLoader {
       Map<String, String> args = this.extractArgs(matcher.group(2));
       return switch (matcher.group(1)) {
         case "change_map" -> {
-          String[] location = args.get("location").split(";");
+          String[] location = args.get("location").split(";", 2);
           int x = Integer.parseInt(location[0]);
           int y = Integer.parseInt(location[1]);
           yield new ChangeMapInteraction(args.get("target"), x, y);
