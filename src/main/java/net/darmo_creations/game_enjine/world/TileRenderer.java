@@ -7,7 +7,6 @@ import net.darmo_creations.game_enjine.render.Texture;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,11 +38,7 @@ public class TileRenderer {
     for (Tile tile : Tile.TILES.values()) {
       String tex = tile.getTexture();
       if (!this.tileTextures.containsKey(tex)) {
-        try {
-          this.tileTextures.put(tex, new Texture(tex + ".png"));
-        } catch (IOException e) {
-          throw new RuntimeException(e);
-        }
+        this.tileTextures.put(tex, new Texture(tex + ".png"));
       }
     }
   }
