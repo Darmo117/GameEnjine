@@ -9,7 +9,7 @@ import java.nio.IntBuffer;
 import static org.lwjgl.stb.STBImage.stbi_load;
 
 public record ByteImage(int width, int height, ByteBuffer image) {
-  public static ByteImage load(final String path) throws IOException {
+  public static ByteImage load(String path) throws IOException {
     ByteBuffer image;
     int width, heigh;
     try (MemoryStack stack = MemoryStack.stackPush()) {

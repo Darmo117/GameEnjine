@@ -7,7 +7,7 @@ import net.darmo_creations.game_enjine.world.World;
 public class HurtEntityInteraction implements TileInteraction {
   private final double damageAmount;
 
-  public HurtEntityInteraction(final double damageAmount) {
+  public HurtEntityInteraction(double damageAmount) {
     this.damageAmount = damageAmount;
   }
 

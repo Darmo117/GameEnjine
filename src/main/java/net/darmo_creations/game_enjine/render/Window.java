@@ -30,7 +30,7 @@ public class Window {
     this.hasResized = false;
   }
 
-  public void show(final String title) {
+  public void show(String title) {
     this.windowPointer = glfwCreateWindow(this.width, this.height, title, this.fullscreen ? glfwGetPrimaryMonitor() : 0, 0);
 
     if (this.windowPointer == 0) {
@@ -109,11 +109,11 @@ public class Window {
     glfwPollEvents();
   }
 
-  public int getWidth() {
+  public int width() {
     return this.width;
   }
 
-  public int getHeight() {
+  public int height() {
     return this.height;
   }
 
@@ -125,11 +125,11 @@ public class Window {
     return this.fullscreen;
   }
 
-  public long getWindowPointer() {
+  public long windowPointer() {
     return this.windowPointer;
   }
 
-  public InputHandler getInputHandler() {
+  public InputHandler inputHandler() {
     return this.inputHandler;
   }
 }

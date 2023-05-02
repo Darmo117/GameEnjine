@@ -2,6 +2,7 @@ package net.darmo_creations.game_enjine.world;
 
 import net.darmo_creations.game_enjine.GameEnjine;
 import net.darmo_creations.game_enjine.render.Texture;
+import net.darmo_creations.game_enjine.utils.ResourceIdentifier;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -38,18 +39,18 @@ public class Tile {
   }
 
   private final int id;
-  private final String texture;
+  private final ResourceIdentifier texture;
 
-  private Tile(final String texture) {
+  private Tile(String texture) {
     this.id = globalID++;
-    this.texture = Paths.get(GameEnjine.DATA_DIR_PATH, Texture.TEXTURES_DIR, TILES_DIR, texture).toString();
+    this.texture = new ResourceIdentifier(Texture.TEXTURES_DIR + "/" + TILES_DIR, texture);
   }
 
-  public int getID() {
+  public int id() {
     return this.id;
   }
 
-  public String getTexture() {
+  public ResourceIdentifier texture() {
     return this.texture;
   }
 }

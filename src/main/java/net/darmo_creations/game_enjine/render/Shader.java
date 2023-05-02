@@ -1,7 +1,6 @@
 package net.darmo_creations.game_enjine.render;
 
 import org.joml.Matrix4f;
-import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 
 import java.io.BufferedReader;
@@ -22,18 +21,18 @@ public class Shader {
   private final int vertexShaderID;
   private final int fragmentShaderID;
 
-  public Shader(final String path) throws IOException {
+  public Shader(String name) throws IOException {
     this.programID = glCreateProgram();
 
     this.vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(this.vertexShaderID, this.readFile(path + ".vs"));
+    glShaderSource(this.vertexShaderID, this.readFile(name + ".vert"));
     glCompileShader(this.vertexShaderID);
     if (glGetShaderi(this.vertexShaderID, GL_COMPILE_STATUS) != 1) {
       throw new IOException(glGetShaderInfoLog(this.vertexShaderID));
     }
 
     this.fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(this.fragmentShaderID, this.readFile(path + ".fs"));
+    glShaderSource(this.fragmentShaderID, this.readFile(name + ".frag"));
     glCompileShader(this.fragmentShaderID);
     if (glGetShaderi(this.fragmentShaderID, GL_COMPILE_STATUS) != 1) {
       throw new IOException(glGetShaderInfoLog(this.fragmentShaderID));
@@ -55,21 +54,14 @@ public class Shader {
     }
   }
 
-  public void setUniform(final String name, final int value) {
+  public void setUniform(String name, int value) {
     int location = glGetUniformLocation(this.programID, name);
     if (location != -1) {
       glUniform1i(location, value);
     }
   }
 
-  public void setUniform(final String name, final Vector4f value) {
-    int location = glGetUniformLocation(this.programID, name);
-    if (location != -1) {
-      glUniform4f(location, value.x, value.y, value.z, value.w);
-    }
-  }
-
-  public void setUniform(final String name, final Matrix4f value) {
+  public void setUniform(String name, final Matrix4f value) {
     int location = glGetUniformLocation(this.programID, name);
     FloatBuffer matrixData = BufferUtils.createFloatBuffer(16);
     value.get(matrixData);
@@ -82,7 +74,7 @@ public class Shader {
     glUseProgram(this.programID);
   }
 
-  private String readFile(final String fileName) throws IOException {
+  private String readFile(String fileName) throws IOException {
     StringBuilder outputString = new StringBuilder();
     URI filePath;
     try {
@@ -100,16 +92,11 @@ public class Shader {
     return outputString.toString();
   }
 
-  @Override
-  protected void finalize() throws Throwable {
-    try {
-      glDetachShader(this.programID, this.vertexShaderID);
-      glDetachShader(this.programID, this.fragmentShaderID);
-      glDeleteShader(this.vertexShaderID);
-      glDeleteShader(this.fragmentShaderID);
-      glDeleteProgram(this.programID);
-    } finally {
-      super.finalize();
-    }
+  public void delete() {
+    glDetachShader(this.programID, this.vertexShaderID);
+    glDetachShader(this.programID, this.fragmentShaderID);
+    glDeleteShader(this.vertexShaderID);
+    glDeleteShader(this.fragmentShaderID);
+    glDeleteProgram(this.programID);
   }
 }

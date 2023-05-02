@@ -9,7 +9,7 @@ public class InputHandler {
   private final boolean[] downKeys = new boolean[GLFW_KEY_LAST];
   private final boolean[] downMouseButtons = new boolean[GLFW_MOUSE_BUTTON_LAST];
 
-  public InputHandler(final long windowPointer) {
+  public InputHandler(long windowPointer) {
     this.windowPointer = windowPointer;
     for (int i = FIRST_KEY; i < GLFW_KEY_LAST; i++) {
       this.downKeys[i] = false;
@@ -19,19 +19,19 @@ public class InputHandler {
     }
   }
 
-  public boolean isKeyDown(final int key) {
+  public boolean isKeyDown(int key) {
     return glfwGetKey(this.windowPointer, key) == GLFW_PRESS;
   }
 
-  public boolean isMouseButtonDown(final int button) {
+  public boolean isMouseButtonDown(int button) {
     return glfwGetMouseButton(this.windowPointer, button) == GLFW_PRESS;
   }
 
-  public boolean isKeyPressed(final int key) {
+  public boolean isKeyPressed(int key) {
     return this.isKeyDown(key) && !this.downKeys[key];
   }
 
-  public boolean isMouseButtonPressed(final int button) {
+  public boolean isMouseButtonPressed(int button) {
     return this.isMouseButtonDown(button) && !this.downMouseButtons[button];
   }
 

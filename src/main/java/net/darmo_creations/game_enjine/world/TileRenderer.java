@@ -4,6 +4,7 @@ import net.darmo_creations.game_enjine.render.Camera;
 import net.darmo_creations.game_enjine.render.Model;
 import net.darmo_creations.game_enjine.render.Shader;
 import net.darmo_creations.game_enjine.render.Texture;
+import net.darmo_creations.game_enjine.utils.ResourceIdentifier;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -11,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class TileRenderer {
-  private final Map<String, Texture> tileTextures;
+  private final Map<ResourceIdentifier, Texture> tileTextures;
   private final Model tileModel;
 
   public TileRenderer() {
@@ -36,23 +37,22 @@ public class TileRenderer {
     this.tileModel = new Model(vertices, texture, indices);
 
     for (Tile tile : Tile.TILES.values()) {
-      String tex = tile.getTexture();
-      if (!this.tileTextures.containsKey(tex)) {
-        this.tileTextures.put(tex, new Texture(tex + ".png"));
+      ResourceIdentifier resource = tile.texture();
+      if (!this.tileTextures.containsKey(resource)) {
+        this.tileTextures.put(resource, new Texture(resource));
       }
     }
   }
 
-  public void renderTile(final Tile tile, final int x, final int y,
-                         final Shader shader, final Matrix4f matrix, final Camera camera) {
+  public void renderTile(Tile tile, int x, int y, Shader shader, final Matrix4f matrix, final Camera camera) {
     shader.bind();
-    if (this.tileTextures.containsKey(tile.getTexture())) {
-      this.tileTextures.get(tile.getTexture()).bind(0);
+    if (this.tileTextures.containsKey(tile.texture())) {
+      this.tileTextures.get(tile.texture()).bind(0);
     }
 
     Matrix4f tilePos = new Matrix4f().translate(new Vector3f(x * 2, y * 2, 0));
     Matrix4f projection = new Matrix4f();
-    camera.getProjection().mul(matrix, projection);
+    camera.projection().mul(matrix, projection);
     projection.mul(tilePos);
 
     shader.setUniform("sampler", 0);

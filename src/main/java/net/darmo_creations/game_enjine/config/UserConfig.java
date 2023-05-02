@@ -11,7 +11,7 @@ public class UserConfig {
   private int windowHeight;
   private boolean fullScreen;
 
-  public UserConfig(final String path) throws IOException {
+  public UserConfig(String path) throws IOException {
     //noinspection MismatchedQueryAndUpdateOfCollection
     Wini ini = new Wini(new File(path));
     this.windowWidth = ini.get("Window", "Width", int.class);
@@ -41,7 +41,7 @@ public class UserConfig {
     this.windowHeight = windowHeight;
   }
 
-  public boolean fullScreen() {
+  public boolean isFullScreen() {
     return this.fullScreen;
   }
 

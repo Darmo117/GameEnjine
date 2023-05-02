@@ -14,8 +14,8 @@ import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
+import java.util.Objects;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -37,7 +37,6 @@ public class GameEnjine {
   private EngineState state;
   private GameState gameState;
   private final WorldLoader worldLoader;
-  @Nullable
   private World world;
 
   public GameEnjine() throws IOException {
@@ -49,7 +48,7 @@ public class GameEnjine {
     if (!glfwInit()) {
       throw new IllegalStateException("Unable to initialize GLFW");
     }
-    this.window = new Window(this.userConfig.windowWidth(), this.userConfig.windowHeight(), this.userConfig.fullScreen(), this.config.resizable());
+    this.window = new Window(this.userConfig.windowWidth(), this.userConfig.windowHeight(), this.userConfig.isFullScreen(), this.config.resizable());
     this.initWindow();
     try {
       this.globalShader = new Shader("shader");
@@ -78,23 +77,23 @@ public class GameEnjine {
     glEnable(GL_TEXTURE_2D);
   }
 
-  public EngineConfig getConfig() {
+  public EngineConfig config() {
     return this.config;
   }
 
-  public UserConfig getUserConfig() {
+  public UserConfig userConfig() {
     return this.userConfig;
   }
 
-  public EngineState getState() {
+  public EngineState state() {
     return this.state;
   }
 
   public void setState(EngineState state) {
-    this.state = state;
+    this.state = Objects.requireNonNull(state);
   }
 
-  public void loadWorld(final String name) {
+  public void loadWorld(String name) {
     try {
       this.world = this.worldLoader.loadWorld(name, this.gameState);
     } catch (IOException e) {
@@ -111,6 +110,7 @@ public class GameEnjine {
   }
 
   private void loop() {
+    // TEMP
     this.loadWorld("map1");
 
     // Cap FPS
@@ -135,7 +135,7 @@ public class GameEnjine {
           if (this.world != null) {
             this.world.calculateView(this.window);
           }
-          glViewport(0, 0, this.window.getWidth(), this.window.getHeight());
+          glViewport(0, 0, this.window.width(), this.window.height());
         }
         this.pollEvents();
         if (this.world != null) {
@@ -159,28 +159,29 @@ public class GameEnjine {
   }
 
   private void pollEvents() {
-    if (this.window.getInputHandler().isKeyDown(GLFW_KEY_ESCAPE)) {
-      glfwSetWindowShouldClose(this.window.getWindowPointer(), true);
+    if (this.window.inputHandler().isKeyDown(GLFW_KEY_ESCAPE)) {
+      glfwSetWindowShouldClose(this.window.windowPointer(), true);
     }
     if (this.world == null) {
       return;
     }
     float speed = 10;
-    if (this.window.getInputHandler().isKeyDown(GLFW_KEY_A)) {
-      this.world.getCamera().getPosition().sub(new Vector3f(-speed, 0, 0));
+    if (this.window.inputHandler().isKeyDown(GLFW_KEY_A)) {
+      this.world.camera().position().sub(new Vector3f(-speed, 0, 0));
     }
-    if (this.window.getInputHandler().isKeyDown(GLFW_KEY_D)) {
-      this.world.getCamera().getPosition().sub(new Vector3f(speed, 0, 0));
+    if (this.window.inputHandler().isKeyDown(GLFW_KEY_D)) {
+      this.world.camera().position().sub(new Vector3f(speed, 0, 0));
     }
-    if (this.window.getInputHandler().isKeyDown(GLFW_KEY_W)) {
-      this.world.getCamera().getPosition().sub(new Vector3f(0, speed, 0));
+    if (this.window.inputHandler().isKeyDown(GLFW_KEY_W)) {
+      this.world.camera().position().sub(new Vector3f(0, speed, 0));
     }
-    if (this.window.getInputHandler().isKeyDown(GLFW_KEY_S)) {
-      this.world.getCamera().getPosition().sub(new Vector3f(0, -speed, 0));
+    if (this.window.inputHandler().isKeyDown(GLFW_KEY_S)) {
+      this.world.camera().position().sub(new Vector3f(0, -speed, 0));
     }
   }
 
   private void cleanUp() {
+    this.globalShader.delete();
     this.window.cleanUp();
     glfwTerminate();
     //noinspection ConstantConditions

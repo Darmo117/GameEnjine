@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 public class WorldLoader {
   public static final String MAPS_DIR = "maps";
 
-  public World loadWorld(final String name, final GameState gameState) throws IOException {
+  public World loadWorld(String name, final GameState gameState) throws IOException {
     Triplet<Integer, Integer, int[]> triplet = this.loadTiles(name);
     int width = triplet.left();
     int height = triplet.middle();
@@ -30,7 +30,7 @@ public class WorldLoader {
     return new World(name, width, height, tiles, interactions, gameState);
   }
 
-  private Triplet<Integer, Integer, int[]> loadTiles(final String mapName) throws IOException {
+  private Triplet<Integer, Integer, int[]> loadTiles(String mapName) throws IOException {
     File path = new File(GameEnjine.DATA_DIR_PATH, MAPS_DIR);
     List<String> lines = Files.readAllLines(new File(path, mapName + ".tiles").toPath());
     int width, height;
@@ -57,7 +57,7 @@ public class WorldLoader {
     return new Triplet<>(width, height, tiles);
   }
 
-  private TileInteraction[] loadInteractions(final String mapName, final int width, final int height) throws IOException {
+  private TileInteraction[] loadInteractions(String mapName, int width, int height) throws IOException {
     File path = new File(GameEnjine.DATA_DIR_PATH, MAPS_DIR);
     List<String> lines = Files.readAllLines(new File(path, mapName + ".int").toPath());
     int[] ints = new int[width * height];
@@ -85,7 +85,7 @@ public class WorldLoader {
     return Arrays.stream(ints).mapToObj(i -> interactionsCache.getOrDefault(i, null)).toArray(TileInteraction[]::new);
   }
 
-  private TileInteraction getInteraction(final String pattern) {
+  private TileInteraction getInteraction(String pattern) {
     if ("wall".equals(pattern)) {
       return WallTileInteraction.get();
     }
@@ -106,7 +106,7 @@ public class WorldLoader {
     return null;
   }
 
-  private Map<String, String> extractArgs(final String pattern) {
+  private Map<String, String> extractArgs(String pattern) {
     Map<String, String> args = new HashMap<>();
     String[] entries = pattern.split(",");
     for (String entry : entries) {
