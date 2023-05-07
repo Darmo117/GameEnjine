@@ -13,7 +13,6 @@ import net.darmo_creations.game_enjine.utils.ResourceIdentifier;
 import net.darmo_creations.game_enjine.world.interactions.TileInteraction;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
-import org.joml.Vector3f;
 
 import java.util.*;
 
@@ -24,10 +23,11 @@ public class World extends Scene {
 
   private final int width;
   private final int height;
+  private int tileScale;
   private final Tile[] tiles;
   private final TileInteraction[] tileInteractions;
   private final List<Entity> entities;
-  private int tileScale;
+  private final PlayerEntity player;
 
   private final Camera camera;
   private Matrix4f scaleMatrix;
@@ -48,11 +48,13 @@ public class World extends Scene {
     this.camera = new Camera();
 
     // TEMP
-    this.entities.add(new PlayerEntity(
-        new Vector2f(1, 2),
-        new Vector2f(3, 3),
+    this.entities.add(this.player = new PlayerEntity(
+        this,
+        new Vector2f(1, 1),
+        new Vector2f(3, 0),
         Collections.singletonList(new ResourceIdentifier("textures/entities/32x32/Character_001"))
     ));
+    this.player.setSpeed(0.05f);
   }
 
   public void setScale(int scale) {
@@ -74,11 +76,12 @@ public class World extends Scene {
     if (x < 0 || y < 0 || x >= this.width || y >= this.height) {
       return Optional.empty();
     }
-    return Optional.ofNullable(this.tileInteractions[x + y * this.width]);
+    return Optional.of(this.tileInteractions[x + (this.height - y - 1) * this.width]);
   }
 
   @Override
   public Optional<SceneAction> update(final Window window) {
+    this.camera.setPosition(this.player.position());
     this.pollEvents(window);
     this.entities.forEach(Entity::update);
     return Optional.empty();
@@ -101,24 +104,23 @@ public class World extends Scene {
 
   private void pollEvents(final Window window) {
     InputHandler inputHandler = window.inputHandler();
-    float speed = 10;
     if (inputHandler.isKeyDown(GLFW_KEY_A)) {
-      this.camera.position().add(new Vector3f(speed, 0, 0));
+      this.player.goLeft();
     }
     if (inputHandler.isKeyDown(GLFW_KEY_D)) {
-      this.camera.position().sub(new Vector3f(speed, 0, 0));
+      this.player.goRight();
     }
     if (inputHandler.isKeyDown(GLFW_KEY_W)) {
-      this.camera.position().add(new Vector3f(0, speed, 0));
+      this.player.goUp();
     }
     if (inputHandler.isKeyDown(GLFW_KEY_S)) {
-      this.camera.position().sub(new Vector3f(0, speed, 0));
+      this.player.goDown();
     }
     this.capCameraPosition(window);
   }
 
   private void capCameraPosition(final Window window) {
-    Vector3f pos = this.camera.position();
+    Vector2f pos = this.camera.position();
     int w = this.width * this.tileScale;
     int h = this.height * this.tileScale;
 

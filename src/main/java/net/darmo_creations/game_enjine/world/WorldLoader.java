@@ -2,10 +2,7 @@ package net.darmo_creations.game_enjine.world;
 
 import net.darmo_creations.game_enjine.GameEnjine;
 import net.darmo_creations.game_enjine.utils.Triplet;
-import net.darmo_creations.game_enjine.world.interactions.ChangeMapInteraction;
-import net.darmo_creations.game_enjine.world.interactions.HurtEntityInteraction;
-import net.darmo_creations.game_enjine.world.interactions.TileInteraction;
-import net.darmo_creations.game_enjine.world.interactions.WallTileInteraction;
+import net.darmo_creations.game_enjine.world.interactions.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -81,7 +78,7 @@ public class WorldLoader {
     } catch (IndexOutOfBoundsException | NumberFormatException e) {
       throw new IOException("could not parse %s.int file".formatted(mapName), e);
     }
-    return Arrays.stream(ints).mapToObj(i -> interactionsCache.getOrDefault(i, null)).toArray(TileInteraction[]::new);
+    return Arrays.stream(ints).mapToObj(i -> interactionsCache.getOrDefault(i, NoInteraction.get())).toArray(TileInteraction[]::new);
   }
 
   private TileInteraction getInteraction(String pattern) {
@@ -91,18 +88,14 @@ public class WorldLoader {
     Matcher matcher = Pattern.compile("^(\\w+)\\[(\\w+=[^=\\[\\],]+(?:,\\w+=[^=\\[\\],]+)*)]$").matcher(pattern);
     if (matcher.find()) {
       Map<String, String> args = this.extractArgs(matcher.group(2));
-      return switch (matcher.group(1)) {
-        case "change_map" -> {
-          String[] location = args.get("location").split(";", 2);
-          int x = Integer.parseInt(location[0]);
-          int y = Integer.parseInt(location[1]);
-          yield new ChangeMapInteraction(args.get("target"), x, y);
-        }
+      String type = matcher.group(1);
+      return switch (type) {
+        case "change_map" -> new ChangeMapInteraction(args.get("target"), 0, ChangeMapInteraction.State.OPEN);
         case "hurt" -> new HurtEntityInteraction(Double.parseDouble(args.get("damage")));
-        default -> null;
+        default -> throw new IllegalArgumentException("undefined interaction type \"%s\"".formatted(type));
       };
     }
-    return null;
+    throw new IllegalArgumentException("could not parse interaction type: " + pattern);
   }
 
   private Map<String, String> extractArgs(String pattern) {
