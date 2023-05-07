@@ -32,7 +32,7 @@ public class Model {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
   }
 
-  private FloatBuffer createBuffer(float[] data) {
+  private FloatBuffer createBuffer(final float[] data) {
     FloatBuffer buffer = BufferUtils.createFloatBuffer(data.length);
     buffer.put(data);
     buffer.flip();

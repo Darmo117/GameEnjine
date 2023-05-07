@@ -7,5 +7,5 @@ public interface TileInteraction {
   default void onEntityCollision(World world, Entity entity) {
   }
 
-  boolean canEntityWalkInsideTile(final World world, final Entity entity);
+  boolean canEntityGoThrough(final World world, final Entity entity);
 }

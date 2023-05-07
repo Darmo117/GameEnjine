@@ -14,7 +14,7 @@ public class WallTileInteraction implements TileInteraction {
   }
 
   @Override
-  public boolean canEntityWalkInsideTile(final World world, final Entity entity) {
+  public boolean canEntityGoThrough(final World world, final Entity entity) {
     return false;
   }
 }

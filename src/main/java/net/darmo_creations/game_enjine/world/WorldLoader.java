@@ -1,7 +1,6 @@
 package net.darmo_creations.game_enjine.world;
 
 import net.darmo_creations.game_enjine.GameEnjine;
-import net.darmo_creations.game_enjine.config.GameState;
 import net.darmo_creations.game_enjine.utils.Triplet;
 import net.darmo_creations.game_enjine.world.interactions.ChangeMapInteraction;
 import net.darmo_creations.game_enjine.world.interactions.HurtEntityInteraction;
@@ -21,20 +20,20 @@ import java.util.regex.Pattern;
 public class WorldLoader {
   public static final String MAPS_DIR = "maps";
 
-  public World loadWorld(String name, final GameState gameState) throws IOException {
-    Triplet<Integer, Integer, int[]> triplet = this.loadTiles(name);
+  public World loadWorld(String name) throws IOException {
+    Triplet<Integer, Integer, Tile[]> triplet = this.loadTiles(name);
     int width = triplet.left();
     int height = triplet.middle();
-    int[] tiles = triplet.right();
+    Tile[] tiles = triplet.right();
     TileInteraction[] interactions = this.loadInteractions(name, width, height);
-    return new World(name, width, height, tiles, interactions, gameState);
+    return new World(name, width, height, tiles, interactions);
   }
 
-  private Triplet<Integer, Integer, int[]> loadTiles(String mapName) throws IOException {
+  private Triplet<Integer, Integer, Tile[]> loadTiles(String mapName) throws IOException {
     File path = new File(GameEnjine.DATA_DIR_PATH, MAPS_DIR);
     List<String> lines = Files.readAllLines(new File(path, mapName + ".tiles").toPath());
     int width, height;
-    int[] tiles;
+    Tile[] tiles;
     try {
       String[] rawMapSize = lines.get(0).trim().split(" ", 2);
       if (rawMapSize.length != 2) {
@@ -42,14 +41,14 @@ public class WorldLoader {
       }
       width = Integer.parseInt(rawMapSize[0]);
       height = Integer.parseInt(rawMapSize[1]);
-      tiles = new int[width * height];
+      tiles = new Tile[width * height];
       for (int row = 0; row < height; row++) {
         String line = lines.get(row + 1).trim();
         String[] tileIDs = line.split(" ", width);
         if (tileIDs.length != width) {
           throw new IOException("could not parse %s.tiles file".formatted(mapName));
         }
-        System.arraycopy(Arrays.stream(tileIDs).mapToInt(Integer::parseInt).toArray(), 0, tiles, row * width, width);
+        System.arraycopy(Arrays.stream(tileIDs).map(id -> Tile.TILES.get(Integer.parseInt(id))).toArray(Tile[]::new), 0, tiles, row * width, width);
       }
     } catch (IndexOutOfBoundsException | NumberFormatException e) {
       throw new IOException("could not parse %s.tiles file".formatted(mapName), e);

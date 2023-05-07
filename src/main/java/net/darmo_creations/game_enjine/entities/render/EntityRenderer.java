@@ -14,9 +14,9 @@ public class EntityRenderer {
   private final Map<String, Map<ResourceIdentifier, Texture>> textures = new HashMap<>();
   private final Map<String, Map<Vector2f, Model>> models = new HashMap<>();
 
-  public void renderEntity(final Entity entity, int x, int y, final Shader shader, final Matrix4f scaleMatrix, final Camera camera) {
+  public void renderEntity(final Entity entity, Shader shader, final Matrix4f scaleMatrix, final Camera camera) {
     String entityType = entity.type();
-    Vector2f position = entity.position().sub(x, y);
+    Vector2f position = entity.position();
     Vector2f size = entity.size();
     ResourceIdentifier texture = entity.texture();
 
@@ -30,13 +30,12 @@ public class EntityRenderer {
     }
     this.textures.get(entityType).get(texture).bind(0);
 
-    Matrix4f tilePos = new Matrix4f().translate(new Vector3f(position.x * 2, position.y * 2, 0));
-    Matrix4f projection = new Matrix4f();
-    camera.projection().mul(scaleMatrix, projection);
+    Matrix4f tilePos = new Matrix4f().translate(new Vector3f(position.x, position.y, 0));
+    Matrix4f projection = camera.projection().mul(scaleMatrix, new Matrix4f());
     projection.mul(tilePos);
 
-    shader.setUniform("sampler", 0);
-    shader.setUniform("projection", projection);
+    shader.setSampler(0);
+    shader.setProjection(projection);
 
     if (!this.models.containsKey(entityType)) {
       this.models.put(entityType, new HashMap<>());

@@ -15,6 +15,9 @@ import java.util.Objects;
 import static org.lwjgl.opengl.GL20.*;
 
 public class Shader {
+  public static final String SAMPLER = "sampler_";
+  public static final String PROJECTION = "projection";
+
   private static final String SHADERS_DIR_PATH = "/shaders";
 
   private final int programID;
@@ -52,6 +55,14 @@ public class Shader {
     if (glGetProgrami(this.programID, GL_VALIDATE_STATUS) != 1) {
       throw new IOException(glGetProgramInfoLog(this.programID));
     }
+  }
+
+  public void setSampler(int value) {
+    this.setUniform(SAMPLER, value);
+  }
+
+  public void setProjection(final Matrix4f projection) {
+    this.setUniform(PROJECTION, projection);
   }
 
   public void setUniform(String name, int value) {

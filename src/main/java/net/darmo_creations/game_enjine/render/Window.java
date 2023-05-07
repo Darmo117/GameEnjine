@@ -76,14 +76,28 @@ public class Window {
     glfwSetWindowSizeCallback(this.windowPointer, this.windowSizeCallback);
   }
 
-  public void cleanUp() {
-    glfwFreeCallbacks(this.windowPointer);
-    this.windowSizeCallback.close();
-    glfwDestroyWindow(this.windowPointer);
+  public int width() {
+    return this.width;
   }
 
-  public boolean shouldClose() {
-    return glfwWindowShouldClose(this.windowPointer);
+  public int height() {
+    return this.height;
+  }
+
+  public boolean hasResized() {
+    return this.hasResized;
+  }
+
+  public boolean isFullscreen() {
+    return this.fullscreen;
+  }
+
+  public long windowPointer() {
+    return this.windowPointer;
+  }
+
+  public InputHandler inputHandler() {
+    return this.inputHandler;
   }
 
   public void swapBuffers() {
@@ -109,27 +123,17 @@ public class Window {
     glfwPollEvents();
   }
 
-  public int width() {
-    return this.width;
+  public void cleanUp() {
+    glfwFreeCallbacks(this.windowPointer);
+    this.windowSizeCallback.close();
+    glfwDestroyWindow(this.windowPointer);
   }
 
-  public int height() {
-    return this.height;
+  public boolean shouldClose() {
+    return glfwWindowShouldClose(this.windowPointer);
   }
 
-  public boolean hasResized() {
-    return this.hasResized;
-  }
-
-  public boolean isFullscreen() {
-    return this.fullscreen;
-  }
-
-  public long windowPointer() {
-    return this.windowPointer;
-  }
-
-  public InputHandler inputHandler() {
-    return this.inputHandler;
+  public void setShouldClose() {
+    glfwSetWindowShouldClose(this.windowPointer(), true);
   }
 }

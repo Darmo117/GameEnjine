@@ -11,9 +11,9 @@ public class UserConfig {
   private int windowHeight;
   private boolean fullScreen;
 
-  public UserConfig(String path) throws IOException {
+  public UserConfig(File path) throws IOException {
     //noinspection MismatchedQueryAndUpdateOfCollection
-    Wini ini = new Wini(new File(path));
+    Wini ini = new Wini(path);
     this.windowWidth = ini.get("Window", "Width", int.class);
     if (this.windowWidth < 100) {
       throw new IllegalArgumentException("window width is too small");

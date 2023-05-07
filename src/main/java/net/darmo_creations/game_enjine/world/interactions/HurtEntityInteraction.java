@@ -21,7 +21,7 @@ public class HurtEntityInteraction implements TileInteraction {
   }
 
   @Override
-  public boolean canEntityWalkInsideTile(World world, Entity entity) {
+  public boolean canEntityGoThrough(World world, Entity entity) {
     return true;
   }
 }

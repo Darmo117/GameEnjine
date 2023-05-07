@@ -1,21 +1,21 @@
 package net.darmo_creations.game_enjine;
 
-import net.darmo_creations.game_enjine.config.EngineConfig;
-import net.darmo_creations.game_enjine.config.GameState;
+import net.darmo_creations.game_enjine.config.GameConfig;
 import net.darmo_creations.game_enjine.config.UserConfig;
 import net.darmo_creations.game_enjine.render.Shader;
 import net.darmo_creations.game_enjine.render.Window;
+import net.darmo_creations.game_enjine.scene.Scene;
+import net.darmo_creations.game_enjine.scene.SceneAction;
 import net.darmo_creations.game_enjine.utils.TimeUtils;
 import net.darmo_creations.game_enjine.world.Tile;
-import net.darmo_creations.game_enjine.world.World;
 import net.darmo_creations.game_enjine.world.WorldLoader;
-import org.joml.Vector3f;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
 
+import java.io.File;
 import java.io.IOException;
-import java.util.Objects;
+import java.util.Optional;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -24,30 +24,28 @@ public class GameEnjine {
   public static final String NAME = "GameEnjine";
   public static final String VERSION = "1.0";
 
-  public static final String GAME_INI_FILE_PATH = "game.ini";
-  public static final String USER_INI_FILE_PATH = "user.ini";
-  public static final String DATA_DIR_PATH = "data";
+  public static final File GAME_INI_FILE_PATH = new File("game.ini");
+  public static final File USER_INI_FILE_PATH = new File("user.ini");
+  public static final File DATA_DIR_PATH = new File("data");
 
-  private final EngineConfig config;
+  private final GameConfig config;
   private final UserConfig userConfig;
 
   private final Window window;
   private final Shader globalShader;
 
-  private EngineState state;
-  private GameState gameState;
   private final WorldLoader worldLoader;
-  private World world;
+  private Scene scene;
 
   public GameEnjine() throws IOException {
     glfwSetErrorCallback((error, description) -> {
       throw new IllegalStateException(GLFWErrorCallback.getDescription(description));
     });
-    this.config = EngineConfig.fromFile(GAME_INI_FILE_PATH);
-    this.userConfig = new UserConfig(USER_INI_FILE_PATH);
     if (!glfwInit()) {
       throw new IllegalStateException("Unable to initialize GLFW");
     }
+    this.config = new GameConfig(GAME_INI_FILE_PATH);
+    this.userConfig = new UserConfig(USER_INI_FILE_PATH);
     this.window = new Window(this.userConfig.windowWidth(), this.userConfig.windowHeight(), this.userConfig.isFullScreen(), this.config.resizable());
     this.initWindow();
     try {
@@ -57,7 +55,6 @@ public class GameEnjine {
     }
     Tile.loadTiles();
     this.worldLoader = new WorldLoader();
-    this.setState(EngineState.MENU);
   }
 
   private void initWindow() {
@@ -77,7 +74,11 @@ public class GameEnjine {
     glEnable(GL_TEXTURE_2D);
   }
 
-  public EngineConfig config() {
+  public Window window() {
+    return this.window;
+  }
+
+  public GameConfig config() {
     return this.config;
   }
 
@@ -85,22 +86,17 @@ public class GameEnjine {
     return this.userConfig;
   }
 
-  public EngineState state() {
-    return this.state;
-  }
-
-  public void setState(EngineState state) {
-    this.state = Objects.requireNonNull(state);
+  public void transitionToScene(Scene scene) {
+    this.scene = scene;
   }
 
   public void loadWorld(String name) {
     try {
-      this.world = this.worldLoader.loadWorld(name, this.gameState);
+      this.scene = this.worldLoader.loadWorld(name);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-    this.world.calculateView(this.window);
-    this.setState(EngineState.INGAME);
+    this.scene.onWindowResized(this.window);
   }
 
   public void run() {
@@ -132,15 +128,11 @@ public class GameEnjine {
         unprocessed -= FRAME_CAP;
         canRender = true;
         if (this.window.hasResized()) {
-          if (this.world != null) {
-            this.world.calculateView(this.window);
-          }
+          this.scene.onWindowResized(this.window);
           glViewport(0, 0, this.window.width(), this.window.height());
         }
-        this.pollEvents();
-        if (this.world != null) {
-          this.world.update(this.window);
-        }
+        Optional<SceneAction> action = this.scene.update(this.window);
+        action.ifPresent(a -> a.execute(this));
         this.window.update();
         if (frameTime >= 1) {
           System.out.println("FPS: " + fps);
@@ -151,32 +143,10 @@ public class GameEnjine {
 
       if (canRender) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        this.world.render(this.globalShader, this.window);
+        this.scene.render(this.globalShader, this.window);
         this.window.swapBuffers();
         fps++;
       }
-    }
-  }
-
-  private void pollEvents() {
-    if (this.window.inputHandler().isKeyDown(GLFW_KEY_ESCAPE)) {
-      glfwSetWindowShouldClose(this.window.windowPointer(), true);
-    }
-    if (this.world == null) {
-      return;
-    }
-    float speed = 10;
-    if (this.window.inputHandler().isKeyDown(GLFW_KEY_A)) {
-      this.world.camera().position().sub(new Vector3f(-speed, 0, 0));
-    }
-    if (this.window.inputHandler().isKeyDown(GLFW_KEY_D)) {
-      this.world.camera().position().sub(new Vector3f(speed, 0, 0));
-    }
-    if (this.window.inputHandler().isKeyDown(GLFW_KEY_W)) {
-      this.world.camera().position().sub(new Vector3f(0, speed, 0));
-    }
-    if (this.window.inputHandler().isKeyDown(GLFW_KEY_S)) {
-      this.world.camera().position().sub(new Vector3f(0, -speed, 0));
     }
   }
 

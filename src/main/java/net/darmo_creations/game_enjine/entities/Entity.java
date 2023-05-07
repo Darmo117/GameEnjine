@@ -56,11 +56,11 @@ public abstract class Entity {
   }
 
   public ResourceIdentifier texture() {
-    return this.textures.get(0); // TODO make depend on entity’s state
+    return this.textures.get(0); // TODO make function of entity’s state
   }
 
   public void update() {
-    if (!this.nextTile.equals(this.tilePosition())) {
+    if (this.nextTile != null && !this.nextTile.equals(this.tilePosition())) {
       this.move();
     }
   }

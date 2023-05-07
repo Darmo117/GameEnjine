@@ -8,7 +8,7 @@ public class Camera {
   private Matrix4f projection;
 
   public Camera() {
-    this.position = new Vector3f(0);
+    this.position = new Vector3f();
   }
 
   public Vector3f position() {
@@ -20,7 +20,7 @@ public class Camera {
   }
 
   public Matrix4f projection() {
-    return this.projection.translate(this.position, new Matrix4f());
+    return this.projection.translate(this.position.negate(new Vector3f()), new Matrix4f());
   }
 
   public void setProjection(int width, int height) {

@@ -54,7 +54,7 @@ public class Texture {
     for (int i = 0; i < this.ids.length; i++) {
       BufferedImage image;
       try {
-        String fileName = identifier.fullPath() + (this.ids.length > 1 ? "_" + i : "") + ".png";
+        String fileName = identifier.fileSystemPath() + (this.ids.length > 1 ? "_" + i : "") + ".png";
         image = ImageIO.read(new File(fileName));
       } catch (IOException e) {
         image = null;
@@ -82,7 +82,7 @@ public class Texture {
     JSONParser parser = new JSONParser();
     int frames;
     double baseInterval;
-    try (FileReader reader = new FileReader(texture.fullPath() + ".anim")) {
+    try (FileReader reader = new FileReader(texture.fileSystemPath() + ".anim")) {
       JSONObject root = (JSONObject) parser.parse(reader);
       frames = (int) root.get("frames");
       baseInterval = (double) root.get("base_interval");

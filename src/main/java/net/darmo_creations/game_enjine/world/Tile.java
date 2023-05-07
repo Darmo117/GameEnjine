@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Tile {
+public final class Tile {
   public static final String TILES_DIR = "tiles";
 
   public static final Map<Integer, Tile> TILES = new HashMap<>();
@@ -20,7 +20,7 @@ public class Tile {
   public static void loadTiles() {
     List<String> lines;
     try {
-      lines = Files.readAllLines(Paths.get(GameEnjine.DATA_DIR_PATH, WorldLoader.MAPS_DIR, "tiles.index"));
+      lines = Files.readAllLines(Paths.get(GameEnjine.DATA_DIR_PATH.getPath(), WorldLoader.MAPS_DIR, "tiles.index"));
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
