@@ -3,12 +3,14 @@ package net.darmo_creations.game_enjine;
 import net.darmo_creations.game_enjine.config.GameConfig;
 import net.darmo_creations.game_enjine.config.UserConfig;
 import net.darmo_creations.game_enjine.render.Shader;
+import net.darmo_creations.game_enjine.render.TextureManager;
 import net.darmo_creations.game_enjine.render.Window;
 import net.darmo_creations.game_enjine.scene.Scene;
 import net.darmo_creations.game_enjine.scene.SceneAction;
+import net.darmo_creations.game_enjine.utils.Logging;
 import net.darmo_creations.game_enjine.utils.TimeUtils;
-import net.darmo_creations.game_enjine.world.Tile;
-import net.darmo_creations.game_enjine.world.WorldLoader;
+import net.darmo_creations.game_enjine.world.Level;
+import net.darmo_creations.game_enjine.world.LevelLoader;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
@@ -16,6 +18,7 @@ import org.lwjgl.opengl.GL;
 import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -28,13 +31,16 @@ public class GameEnjine {
   public static final File USER_INI_FILE_PATH = new File("user.ini");
   public static final File DATA_DIR_PATH = new File("data");
 
+  private final Logger logger = Logging.getLogger("Game Enjine");
+
   private final GameConfig config;
   private final UserConfig userConfig;
 
   private final Window window;
   private final Shader globalShader;
+  private final TextureManager textureManager;
 
-  private final WorldLoader worldLoader;
+  private final LevelLoader levelLoader;
   private Scene scene;
 
   public GameEnjine() throws IOException {
@@ -53,8 +59,8 @@ public class GameEnjine {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-    Tile.loadTiles();
-    this.worldLoader = new WorldLoader();
+    this.textureManager = new TextureManager();
+    this.levelLoader = new LevelLoader(this);
   }
 
   private void initWindow() {
@@ -86,28 +92,34 @@ public class GameEnjine {
     return this.userConfig;
   }
 
+  public TextureManager textureManager() {
+    return this.textureManager;
+  }
+
   public void transitionToScene(Scene scene) {
     this.scene = scene;
   }
 
   public void loadWorld(String name) {
     try {
-      this.scene = this.worldLoader.loadWorld(name);
+      this.scene = this.levelLoader.loadLevel(name);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
+    Level level = (Level) this.scene;
+    level.spawnEntities(level.defaultSpawnLocation());
     this.scene.onWindowResized(this.window);
   }
 
   public void run() {
-    System.out.printf("Running %s v%s with LWJGL %s%n", NAME, VERSION, Version.getVersion());
+    this.logger.info("Running %s v%s with LWJGL %s".formatted(NAME, VERSION, Version.getVersion()));
     this.loop();
     this.cleanUp();
   }
 
   private void loop() {
     // TEMP
-    this.loadWorld("map1");
+    this.loadWorld("test");
 
     // Cap FPS
     final double FRAME_CAP = 1 / 60.0; // 60 FPS
@@ -153,8 +165,8 @@ public class GameEnjine {
   private void cleanUp() {
     this.globalShader.delete();
     this.window.cleanUp();
-    glfwTerminate();
-    //noinspection ConstantConditions
+    //noinspection DataFlowIssue
     glfwSetErrorCallback(null).free();
+    glfwTerminate();
   }
 }

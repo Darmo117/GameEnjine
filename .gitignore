@@ -1,6 +1,7 @@
 .idea
-build
-run
+build/
+run/
+generate_maps/
 
 # Project exclude paths
-/.gradle/
+.gradle/

@@ -1,7 +1,7 @@
 package net.darmo_creations.game_enjine.world.interactions;
 
 import net.darmo_creations.game_enjine.entities.Entity;
-import net.darmo_creations.game_enjine.world.World;
+import net.darmo_creations.game_enjine.world.Level;
 
 public class NoInteraction implements TileInteraction {
   private static final TileInteraction INSTANCE = new NoInteraction();
@@ -14,7 +14,12 @@ public class NoInteraction implements TileInteraction {
   }
 
   @Override
-  public boolean canEntityGoThrough(World world, Entity entity) {
+  public byte id() {
+    return 0;
+  }
+
+  @Override
+  public boolean canEntityGoThrough(Level level, Entity entity) {
     return true;
   }
 }

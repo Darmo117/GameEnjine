@@ -1,13 +1,10 @@
 package net.darmo_creations.game_enjine.entities;
 
-import net.darmo_creations.game_enjine.utils.ResourceIdentifier;
-import net.darmo_creations.game_enjine.world.World;
+import net.darmo_creations.game_enjine.world.Level;
 import org.joml.Vector2f;
 
-import java.util.List;
-
 public class PlayerEntity extends Entity {
-  public PlayerEntity(World world, final Vector2f size, final Vector2f position, final List<ResourceIdentifier> texture) {
-    super(world, "player", size, position, texture);
+  public PlayerEntity(Level level, final Vector2f size, final Vector2f position, String spritesheet) {
+    super(level, "player", size, position, spritesheet);
   }
 }

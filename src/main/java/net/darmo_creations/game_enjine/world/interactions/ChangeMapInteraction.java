@@ -1,8 +1,10 @@
 package net.darmo_creations.game_enjine.world.interactions;
 
+import io.netty.buffer.ByteBuf;
 import net.darmo_creations.game_enjine.entities.Entity;
 import net.darmo_creations.game_enjine.entities.PlayerEntity;
-import net.darmo_creations.game_enjine.world.World;
+import net.darmo_creations.game_enjine.utils.ByteBufferUtils;
+import net.darmo_creations.game_enjine.world.Level;
 
 public class ChangeMapInteraction implements TileInteraction {
   private final String targetMapName;
@@ -16,15 +18,28 @@ public class ChangeMapInteraction implements TileInteraction {
   }
 
   @Override
-  public void onEntityCollision(World world, Entity entity) {
+  public byte id() {
+    return 2;
+  }
+
+  @Override
+  public void onEntityCollision(Level level, Entity entity) {
     if (this.state.isOpen() && entity instanceof PlayerEntity) {
       // TODO load map
     }
   }
 
   @Override
-  public boolean canEntityGoThrough(World world, Entity entity) {
+  public boolean canEntityGoThrough(Level level, Entity entity) {
     return this.state.isOpen();
+  }
+
+  @Override
+  public void toBuffer(ByteBuf bb) {
+    TileInteraction.super.toBuffer(bb);
+    ByteBufferUtils.putString(bb, this.targetMapName);
+    bb.writeInt(this.doorID);
+    ByteBufferUtils.putEnumValue(bb, this.state);
   }
 
   public enum State {

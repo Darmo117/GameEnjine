@@ -22,6 +22,8 @@ dependencies {
     implementation 'com.google.code.findbugs:jsr305:3.0.2'
     implementation 'org.joml:joml:1.10.4'
     implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+    // https://mvnrepository.com/artifact/io.netty/netty-buffer
+    implementation group: 'io.netty', name: 'netty-buffer', version: '4.1.92.Final'
 
     // INI4J
     implementation 'org.ini4j:ini4j:0.5.4'

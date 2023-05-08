@@ -1,38 +1,46 @@
 package net.darmo_creations.game_enjine.entities;
 
-import net.darmo_creations.game_enjine.utils.ResourceIdentifier;
-import net.darmo_creations.game_enjine.world.World;
+import net.darmo_creations.game_enjine.render.Model;
+import net.darmo_creations.game_enjine.render.QuadModel;
+import net.darmo_creations.game_enjine.world.Level;
 import org.joml.RoundingMode;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public abstract class Entity {
-  private static final Vector2i UP = new Vector2i(0, 1);
-  private static final Vector2i DOWN = new Vector2i(0, -1);
-  private static final Vector2i RIGHT = new Vector2i(1, 0);
-  private static final Vector2i LEFT = new Vector2i(-1, 0);
+  private static final Vector2i[] DIRECTIONS = {
+      new Vector2i(0, -1), // down
+      new Vector2i(-1, 0), // left
+      new Vector2i(1, 0), // right
+      new Vector2i(0, 1), // up
+  };
 
   private static final float EPS = 1e-5f;
 
-  private final World world;
+  private final Level level;
   private final String type;
   private final Vector2f size;
   private final Vector2f position;
+  private final String spritesheet;
+  private int direction;
   private float speed;
   private Vector2i nextTile;
   private float remainingDistance;
-  private final List<ResourceIdentifier> textures;
+  private final Model model;
 
-  protected Entity(World world, String type, final Vector2f size, final Vector2f position,
-                   final List<ResourceIdentifier> textures) {
-    this.world = world;
+  protected Entity(Level level, String type, final Vector2f size, final Vector2f position, String spritesheet) {
+    this.level = level;
     this.type = type;
     this.size = size;
     this.position = new Vector2f(position);
-    this.textures = new ArrayList<>(textures);
+    this.direction = 0;
+    this.spritesheet = spritesheet;
+    this.model = new QuadModel(size, new float[] {
+        0, 0,
+        1, 0,
+        1, 1,
+        0, 1,
+    });
   }
 
   public String type() {
@@ -59,6 +67,10 @@ public abstract class Entity {
     this.position.set(position);
   }
 
+  public int direction() {
+    return this.direction;
+  }
+
   public Vector2f size() {
     return new Vector2f(this.size);
   }
@@ -67,8 +79,12 @@ public abstract class Entity {
     this.size.set(size);
   }
 
-  public ResourceIdentifier texture() {
-    return this.textures.get(0); // TODO make function of entity’s state
+  public String spritesheet() {
+    return this.spritesheet;
+  }
+
+  public Model model() {
+    return this.model;
   }
 
   public boolean isMoving() {
@@ -107,22 +123,23 @@ public abstract class Entity {
   }
 
   public void goUp() {
-    this.moveToNextTile(UP);
+    this.moveToNextTile(3);
   }
 
   public void goDown() {
-    this.moveToNextTile(DOWN);
+    this.moveToNextTile(0);
   }
 
   public void goRight() {
-    this.moveToNextTile(RIGHT);
+    this.moveToNextTile(2);
   }
 
   public void goLeft() {
-    this.moveToNextTile(LEFT);
+    this.moveToNextTile(1);
   }
 
-  private void moveToNextTile(final Vector2i direction) {
+  private void moveToNextTile(int d) {
+    Vector2i direction = DIRECTIONS[d];
     if (direction.x() != 0 && direction.y() != 0) {
       throw new IllegalArgumentException("entities cannot move along two axes at the same time");
     }
@@ -130,12 +147,13 @@ public abstract class Entity {
       return;
     }
     Vector2i pos = this.tilePosition().add(direction, new Vector2i());
-    boolean canGoToTile = this.world.getTileInteraction(pos.x, pos.y)
-        .map(ti -> ti.canEntityGoThrough(this.world, this))
+    boolean canGoToTile = this.level.getTileInteraction(pos.x, pos.y)
+        .map(ti -> ti.canEntityGoThrough(this.level, this))
         .orElse(false);
     if (canGoToTile) {
       this.nextTile = pos;
       this.remainingDistance = (float) this.nextTile.distance(this.tilePosition());
+      this.direction = d;
     }
   }
 }

@@ -1,7 +1,7 @@
 package net.darmo_creations.game_enjine.world.interactions;
 
 import net.darmo_creations.game_enjine.entities.Entity;
-import net.darmo_creations.game_enjine.world.World;
+import net.darmo_creations.game_enjine.world.Level;
 
 public class WallTileInteraction implements TileInteraction {
   private static final WallTileInteraction INSTANCE = new WallTileInteraction();
@@ -14,7 +14,12 @@ public class WallTileInteraction implements TileInteraction {
   }
 
   @Override
-  public boolean canEntityGoThrough(final World world, final Entity entity) {
+  public byte id() {
+    return 1;
+  }
+
+  @Override
+  public boolean canEntityGoThrough(final Level level, final Entity entity) {
     return false;
   }
 }

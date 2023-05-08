@@ -1,5 +1,7 @@
 package net.darmo_creations.game_enjine.input;
 
+import java.util.Arrays;
+
 import static org.lwjgl.glfw.GLFW.*;
 
 public class InputHandler {
@@ -14,9 +16,7 @@ public class InputHandler {
     for (int i = FIRST_KEY; i < GLFW_KEY_LAST; i++) {
       this.downKeys[i] = false;
     }
-    for (int i = 0; i < GLFW_MOUSE_BUTTON_LAST; i++) {
-      this.downMouseButtons[i] = false;
-    }
+    Arrays.fill(this.downMouseButtons, false);
   }
 
   public boolean isKeyDown(int key) {
